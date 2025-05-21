@@ -1,71 +1,67 @@
-
-import machine
-import neopixel
 import time
+import board
+import neopixel
+import RPi.GPIO as GPIO
 
-#pin values in main.py 
+# Constants
+GLOW_TIME = 5  # seconds
+DELAY_TIME = 0.5  # seconds
+NUM_LAMPS = 6
+WHITE = (255, 255, 255)
+
 
 class StreetLampController:
-    # config lamps
-    def __init__(self, neopixel_pin, motion_pins, num_leds=6, color=(255, 255, 255),
-                 glow_time=5000, neighbor_delay=500, use_neighbor_logic=True):
-        self.num_leds = num_leds
+    def __init__(self, neopixel_pin, motion_pins, color=WHITE, use_neighbor_logic=True):
+        self.num_lamps = len(motion_pins)
         self.color = color
-        self.glow_time = glow_time
-        self.neighbor_delay = neighbor_delay
+        self.motion_pins = motion_pins
         self.use_neighbor_logic = use_neighbor_logic
 
-        self.strip = neopixel.NeoPixel(machine.Pin(neopixel_pin), num_leds)
-        self.motion_sensors = [machine.Pin(pin, machine.Pin.IN) for pin in motion_pins]
+        # Setup motion sensors
+        GPIO.setmode(GPIO.BCM)
+        for pin in motion_pins:
+            GPIO.setup(pin, GPIO.IN)
 
-        self.glow_until = [0] * num_leds
-        self.neighbor_trigger_time = [0] * num_leds
-        self.neighbor_triggered = [False] * num_leds
+        # Setup NeoPixel strip
+        self.strip = neopixel.NeoPixel(neopixel_pin, self.num_lamps, auto_write=False)
 
-    def _set_led(self, index, color):
-        self.strip[index] = color
-
-    def _clear_led(self, index):
-        self._set_led(index, (0, 0, 0))
-
-    # config motion sensors 
-    def _handle_motion(self, now, motion_flags):
-        for i in range(self.num_leds):
-            if motion_flags[i]:
-                self._set_led(i, self.color)
-                self.glow_until[i] = now + self.glow_time
-    
-    # config react to neighbor 
-    def _handle_neighbors(self, now, motion_flags):
-        for i in range(self.num_leds):
-            if not motion_flags[i]:
-                left = motion_flags[i - 1] if i > 0 else False
-                right = motion_flags[i + 1] if i < self.num_leds - 1 else False
-                if left or right:
-                    self.neighbor_trigger_time[i] = now + self.neighbor_delay
-                    self.neighbor_triggered[i] = True
-
-    # config updating led to current status
-    def _update_leds(self, now):
-        for i in range(self.num_leds):
-            if self.neighbor_triggered[i] and now >= self.neighbor_trigger_time[i]:
-                self._set_led(i, self.color)
-                self.glow_until[i] = now + self.glow_time
-                self.neighbor_triggered[i] = False
-
-            if now > self.glow_until[i]:
-                self._clear_led(i)
-
-        self.strip.write() # writes the new config to the leds
+        # State tracking
+        self.motion_states = [False] * self.num_lamps
+        self.timer_on = [0.0] * self.num_lamps
+        self.neighbor_triggers = [False] * self.num_lamps
+        self.neighbor_timer = [0.0] * self.num_lamps
 
     def update(self):
-        now = time.ticks_ms()
-        motion_flags = [sensor.value() for sensor in self.motion_sensors] # reading all sensors
+        current_time = time.monotonic()
 
-        self._handle_motion(now, motion_flags) # trigges led if motion is detected
+        # 1. Check motion sensors
+        for i, pin in enumerate(self.motion_pins):
+            self.motion_states[i] = GPIO.input(pin) == GPIO.HIGH
 
+        # 2. Handle direct motion triggers
+        for i in range(self.num_lamps):
+            if self.motion_states[i]:
+                self.timer_on[i] = current_time
+                self.strip[i] = self.color
+            else:
+                if current_time - self.timer_on[i] > GLOW_TIME:
+                    self.strip[i] = (0, 0, 0)
+
+        # 3. Neighbor logic
         if self.use_neighbor_logic:
-            self._handle_neighbors(now, motion_flags) # checking for neighbors Leds
+            for i in range(self.num_lamps):
+                if not self.motion_states[i]:
+                    left = i - 1 if i > 0 else 0
+                    right = i + 1 if i < self.num_lamps - 1 else self.num_lamps - 1
+                    if self.motion_states[left] or self.motion_states[right]:
+                        if not self.neighbor_triggers[i]:
+                            self.neighbor_triggers[i] = True
+                            self.neighbor_timer[i] = current_time
 
-        self._update_leds(now) 
+                if self.neighbor_triggers[i] and current_time - self.neighbor_timer[i] > DELAY_TIME:
+                    self.strip[i] = self.color
+                    self.timer_on[i] = current_time
+                    self.neighbor_triggers[i] = False
 
+        # 4. Push to strip
+        self.strip.show()
