@@ -1,5 +1,6 @@
 import time
 import board
+import rpi_ws281x
 import neopixel
 import RPi.GPIO as GPIO
 
