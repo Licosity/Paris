@@ -21,7 +21,7 @@ MOTION_SENSOR_PINS = [17, 27, 22, 5, 6, 13]
 lamp_system = StreetLampController(
     neopixel_pin=NEOPIXEL_PIN,
     motion_pins=MOTION_SENSOR_PINS,
-    color=(255, 255, 255),  
+    color=(255, 0, 0),  
     use_neighbor_logic=True
 )
 
