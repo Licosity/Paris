@@ -2,8 +2,20 @@
 import board
 import time
 from street import StreetLampController
+import rpi_ws281x
+import neopixel
+import RPi.GPIO as GPIO
+#street constants
 
-NEOPIXEL_PIN = board.D18  # GPIO18 (physical pin 12) 
+# Constants
+GLOW_TIME = 5  # seconds
+DELAY_TIME = 0.5  # seconds
+NUM_LAMPS = 6
+WHITE = (255, 255, 255)
+
+
+
+NEOPIXEL_PIN = board.D18  # pin 12 
 MOTION_SENSOR_PINS = [17, 27, 22, 5, 6, 13]  
 
 lamp_system = StreetLampController(
