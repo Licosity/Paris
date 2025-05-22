@@ -8,7 +8,7 @@ import RPi.GPIO as GPIO
 
 
 #street constants
-GLOW_TIME = 3  # seconds
+GLOW_TIME = 2  # seconds
 DELAY_TIME = 0.3  # seconds
 NUM_LAMPS = 6
 WHITE = (255, 0, 0)
