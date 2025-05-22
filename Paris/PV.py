@@ -1,164 +1,154 @@
-
-from  machine import Pin, ADC, PWM
 import time
+import threading
 
-#Definitions NEED ADJUSTMENT!
-UPPER_X_SERVO_PIN = 13
-UPPER_Y_SERVO_PIN = 12
-MIDDLE_X_SERVO_PIN = 14
-MIDDLE_Y_SERVO_PIN = 27
-LOWER_X_SERVO_PIN = 26
-LOWER_Y_SERVO_PIN = 25
+# For Raspberry Pi GPIO handling
+import RPi.GPIO as GPIO
 
-UPPER_LED = 34  # ADC-capable pin
-RIGHT_LED = 35
-LOWER_LED = 32
-LEFT_LED = 33
-WIND_FLOW_VOLTAGE_PIN = 36
-SOLAR_PANELS_VOLTAGE_PIN = 39
+class SolarTracker:
+    def __init__(self):
+        # GPIO Mode
+        GPIO.setmode(GPIO.BCM)
 
-#Constants
-UPPER_X_OFFSET = 100
-UPPER_Y_OFFSET = 90
-MIDDLE_X_OFFSET = 90
-MIDDLE_Y_OFFSET = 90
-LOWER_X_OFFSET = 90
-LOWER_Y_OFFSET = 90
+        # Servo pins (use actual PWM-capable GPIO pins)
+        self.servo_pins = {
+            'upper_x': 13,
+            'upper_y': 12,
+            'middle_x': 14,
+            'middle_y': 27,
+            'lower_x': 26,
+            'lower_y': 25
+        }
 
-TOLERANCE = 200     # Adjusted for 12-bit ADC (0–4095)
-WIND_FLOW_TOLERANCE = 200
-HISTORY_LENGTH = 60
-MOVING_DELAY = 14  # milliseconds
+        # Light sensor pins (use MCP3008 via SPI or I2C ADC chip if analog input needed)
+        # Here we assume a function to read analog values, to be implemented separately
+        self.sensor_labels = ['upper', 'right', 'lower', 'left', 'wind', 'solar']
 
-#Helper Functions to control servo
-def setup_servo(pin_num):
-    pwm = PWM(Pin(pin_num), freq=50)
-    return pwm
+        # Servo Offsets
+        self.offsets = {
+            'upper_x': 100,
+            'upper_y': 90,
+            'middle_x': 90,
+            'middle_y': 90,
+            'lower_x': 90,
+            'lower_y': 90
+        }
 
-def write_servo(pwm, angle):
-    # Convert 0–180° angle to duty (40–115 for ESP32 PWM)
-    duty = int((angle / 180.0) * 75 + 40)
-    pwm.duty(duty)
+        # Constants
+        self.TOLERANCE = 200
+        self.WIND_FLOW_TOLERANCE = 200
+        self.HISTORY_LENGTH = 60
+        self.MOVING_DELAY = 0.014  # seconds
 
-def read_adc(adc):
-    return adc.read()
+        # Servo setup
+        self.servos = self.setup_servos()
 
-#Setup
-upperX = setup_servo(UPPER_X_SERVO_PIN)
-upperY = setup_servo(UPPER_Y_SERVO_PIN)
-middleX = setup_servo(MIDDLE_X_SERVO_PIN)
-middleY = setup_servo(MIDDLE_Y_SERVO_PIN)
-lowerX = setup_servo(LOWER_X_SERVO_PIN)
-lowerY = setup_servo(LOWER_Y_SERVO_PIN)
+        # State variables
+        self.x_pos = 0
+        self.y_pos = 0
+        self.current_x = 0
+        self.current_y = 0
+        self.previous_x = 0
+        self.previous_y = 0
+        self.auto_position = True
+        self.shadow_safety = False
+        self.voltage_history = []
 
-adc_upper = ADC(Pin(UPPER_LED))
-adc_upper.atten(ADC.ATTN_11DB)
-adc_right = ADC(Pin(RIGHT_LED))
-adc_right.atten(ADC.ATTN_11DB)
-adc_lower = ADC(Pin(LOWER_LED))
-adc_lower.atten(ADC.ATTN_11DB)
-adc_left = ADC(Pin(LEFT_LED))
-adc_left.atten(ADC.ATTN_11DB)
-adc_wind = ADC(Pin(WIND_FLOW_VOLTAGE_PIN))
-adc_wind.atten(ADC.ATTN_11DB)
-adc_solar = ADC(Pin(SOLAR_PANELS_VOLTAGE_PIN))
-adc_solar.atten(ADC.ATTN_11DB)
+        # Timers
+        self.last_second = time.time()
+        self.last_twenty = time.time()
+        self.last_move = time.time()
 
-#Variables
-x_pos = 0
-y_pos = 0
-current_x = 0
-current_y = 0
-previous_x = 0
-previous_y = 0
-auto_position = True
-shadow_safety = False
-serial_buffer = ""
-voltage_history = []
+    def setup_servos(self):
+        servos = {}
+        for label, pin in self.servo_pins.items():
+            GPIO.setup(pin, GPIO.OUT)
+            pwm = GPIO.PWM(pin, 50)
+            pwm.start(0)
+            servos[label] = pwm
+        return servos
 
-last_second = time.ticks_ms()
-last_twenty = time.ticks_ms()
-last_move = time.ticks_ms()
+    def write_servo(self, label, angle):
+        duty = (angle / 18.0) + 2
+        self.servos[label].ChangeDutyCycle(duty)
 
-#Main Loop
-while True:
-    #Serial input for manual control (USB/REPL)
-    if serial_buffer == "" and time.ticks_diff(time.ticks_ms(), last_second) >= 500:
+    def read_adc(self, label):
+        # Placeholder: should read from MCP3008 or similar
+        return 0
+
+    def update_voltage_history(self):
+        v = self.read_adc('solar')
+        if len(self.voltage_history) < self.HISTORY_LENGTH:
+            self.voltage_history.append(v)
+        else:
+            self.voltage_history.pop(0)
+            self.voltage_history.append(v)
+
+    def auto_position_logic(self):
+        if self.read_adc('wind') < self.WIND_FLOW_TOLERANCE:
+            if len(self.voltage_history):
+                avg = sum(self.voltage_history) // len(self.voltage_history)
+
+            if time.time() - self.last_move >= self.MOVING_DELAY:
+                if self.read_adc('right') - self.read_adc('left') > self.TOLERANCE:
+                    self.x_pos += 1
+                elif self.read_adc('left') - self.read_adc('right') > self.TOLERANCE:
+                    self.x_pos -= 1
+
+                if self.read_adc('upper') - self.read_adc('lower') > self.TOLERANCE:
+                    self.y_pos -= 1
+                elif self.read_adc('lower') - self.read_adc('upper') > self.TOLERANCE:
+                    self.y_pos += 1
+
+                self.x_pos = max(-90, min(90, self.x_pos))
+                self.y_pos = max(-90, min(90, self.y_pos))
+
+                self.last_move = time.time()
+        else:
+            self.x_pos = 0
+            self.y_pos = 0
+
+    def move_servos(self):
+        if time.time() - self.last_move >= self.MOVING_DELAY:
+            if self.current_x < self.x_pos: self.current_x += 1
+            elif self.current_x > self.x_pos: self.current_x -= 1
+
+            if self.current_y < self.y_pos: self.current_y += 1
+            elif self.current_y > self.y_pos: self.current_y -= 1
+
+            self.current_x = max(-90, min(90, self.current_x))
+            self.current_y = max(-90, min(90, self.current_y))
+
+            for label in ['upper', 'middle', 'lower']:
+                self.write_servo(f'{label}_x', self.current_x + self.offsets[f'{label}_x'])
+                self.write_servo(f'{label}_y', self.current_y + self.offsets[f'{label}_y'])
+
+            self.last_move = time.time()
+
+    def update_previous_position(self):
+        if time.time() - self.last_twenty >= 20:
+            self.previous_x = self.x_pos
+            self.previous_y = self.y_pos
+            self.last_twenty = time.time()
+
+    def run(self):
         try:
-            if input().startswith("§$%&: "):
-                line = input()[6:]
-                if ',' in line:
-                    x_str, y_str = line.split(',')
-                    x_pos = int(x_str)
-                    y_pos = int(y_str)
-                    auto_position = False
-                else:
-                    auto_position = True
-        except Exception:
-            pass
+            while True:
+                self.update_voltage_history()
+                if self.auto_position:
+                    self.auto_position_logic()
+                self.update_previous_position()
+                self.move_servos()
 
-    #Every second: store solar voltage
-    if time.ticks_diff(time.ticks_ms(), last_second) >= 1000:
-        v = read_adc(adc_solar)
-        if len(voltage_history) < HISTORY_LENGTH:
-            voltage_history.append(v)
-        else:
-            voltage_history.pop(0)
-            voltage_history.append(v)
-        last_second = time.ticks_ms()
+                # Debug
+                print("Wind:", self.read_adc('wind'))
+                print("X Pos:", self.x_pos)
+                print("Auto Mode:", self.auto_position)
+                print("---------------------------")
 
-    #Auto-positioning PV
-    if auto_position:
-        if read_adc(adc_wind) < WIND_FLOW_TOLERANCE:
-            avg = sum(voltage_history) // len(voltage_history) if voltage_history else 0
-            if time.ticks_diff(time.ticks_ms(), last_move) >= MOVING_DELAY:
-                if (read_adc(adc_right) - read_adc(adc_left)) > TOLERANCE:
-                    x_pos += 1
-                elif (read_adc(adc_left) - read_adc(adc_right)) > TOLERANCE:
-                    x_pos -= 1
+                time.sleep(0.01)
+        except KeyboardInterrupt:
+            for pwm in self.servos.values():
+                pwm.stop()
+            GPIO.cleanup()
 
-                if (read_adc(adc_upper) - read_adc(adc_lower)) > TOLERANCE:
-                    y_pos -= 1
-                elif (read_adc(adc_lower) - read_adc(adc_upper)) > TOLERANCE:
-                    y_pos += 1
 
-                x_pos = max(-90, min(90, x_pos))
-                y_pos = max(-90, min(90, y_pos))
-
-                last_move = time.ticks_ms()
-        else:
-            x_pos, y_pos = 0, 0
-
-    #Every 20s: remember previous position
-    if time.ticks_diff(time.ticks_ms(), last_twenty) >= 20000:
-        previous_x = x_pos
-        previous_y = y_pos
-        last_twenty = time.ticks_ms()
-
-    #move to new position
-    if time.ticks_diff(time.ticks_ms(), last_move) >= MOVING_DELAY:
-        if current_x < x_pos: current_x += 1
-        elif current_x > x_pos: current_x -= 1
-
-        if current_y < y_pos: current_y += 1
-        elif current_y > y_pos: current_y -= 1
-
-        current_x = max(-90, min(90, current_x))
-        current_y = max(-90, min(90, current_y))
-
-        write_servo(upperX, current_x + UPPER_X_OFFSET)
-        write_servo(upperY, current_y + UPPER_Y_OFFSET)
-        write_servo(middleX, current_x + MIDDLE_X_OFFSET)
-        write_servo(middleY, current_y + MIDDLE_Y_OFFSET)
-        write_servo(lowerX, current_x + LOWER_X_OFFSET)
-        write_servo(lowerY, current_y + LOWER_Y_OFFSET)
-
-        last_move = time.ticks_ms()
-
-    # --- Debugging Output ---
-    print("Wind:", read_adc(adc_wind))
-    print("X Pos:", x_pos)
-    print("Auto Mode:", auto_position)
-    print("---------------------------")
-
-    time.sleep_ms(10)
