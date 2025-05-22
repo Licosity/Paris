@@ -5,13 +5,13 @@ from street import StreetLampController
 import rpi_ws281x
 import neopixel
 import RPi.GPIO as GPIO
-#street constants
 
-# Constants
-GLOW_TIME = 5  # seconds
-DELAY_TIME = 0.5  # seconds
+
+#street constants
+GLOW_TIME = 3  # seconds
+DELAY_TIME = 0.3  # seconds
 NUM_LAMPS = 6
-WHITE = (255, 255, 255)
+WHITE = (255, 0, 0)
 
 
 
