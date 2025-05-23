@@ -51,6 +51,7 @@ class House:
 
             if temp is not None and temp < self.min_temp and motion:
                 GPIO.output(infra_pin, GPIO.HIGH)
+                print("human detected")
                 return now  # Update activation time
             elif now - last_activation_time >= self.run_time:
                 GPIO.output(infra_pin, GPIO.LOW)
