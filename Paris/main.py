@@ -13,8 +13,8 @@ from house import House
 GLOW_TIME = 3  # seconds
 DELAY_TIME = 0.3  # seconds
 WHITE = (255, 255, 255)
-NEOPIXEL_PIN = board.D18  # pin 12 
-MOTION_PINS = [17, 27, 22, 5, 6, 13]  
+NEOPIXEL_PIN = 4  # actual pin 7
+MOTION_PINS = [17, 12, 27, 22, 23, 24]  # actual pin 11, 12, 13, 15, 16, 18
 
 
 
@@ -32,10 +32,8 @@ def main():
             time.sleep(0.08)
     except KeyboardInterrupt: # ctrl C to stop programm 
         print("Cleaning up program...")
-    finally:
         IndoorF.cleanup()
         GPIO.cleanup()
-        print("Programm stopped successfully")
 
 
 
