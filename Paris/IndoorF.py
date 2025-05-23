@@ -8,14 +8,16 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 from adafruit_mcp3xxx.mcp3008 import MCP3008
 import RPi.GPIO as GPIO
 
-LED_IF_PIN = 18
+
+
+LED_IF_PIN = 20 # actual pin 38
 
 class EnvController:
     def __init__(
         self,
-        dht_pin=4,
-        fan_pin=17,
-        ldr_channel=0,
+        dht_pin=12, # actual pin 32
+        fan_pin=16, # actual pin 36
+        ldr_channel=21, # actual pin 40
         ldr_threshold=400,
         temp_threshold=28,
         humidity_threshold=60,
@@ -31,7 +33,7 @@ class EnvController:
         self.fan_pin = fan_pin
 
         # --- DHT22 Sensor ---
-        self.dht = adafruit_dht.DHT22(board.D4)  # GPIO 4
+        self.dht = adafruit_dht.DHT22(12)  # actual pin 32
 
         self.temp_threshold = temp_threshold
         self.humidity_threshold = humidity_threshold
@@ -93,12 +95,14 @@ class EnvController:
         GPIO.output(LED_IF_PIN, GPIO.LOW)
         GPIO.cleanup()
 
+IndoorF = EnvController()
+#test
 
 try:
     while True:
         ldr_value = 300
-        EnvController.update()
+        IndoorF.update()
         time.sleep(0.1)
 except KeyboardInterrupt:
     print("Cleaning up program...")
-    EnvController.cleanup()
+    IndoorF.cleanup()
