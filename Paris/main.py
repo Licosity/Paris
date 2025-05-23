@@ -32,8 +32,10 @@ def main():
             time.sleep(0.08)
     except KeyboardInterrupt: # ctrl C to stop programm 
         print("Cleaning up program...")
+    finally:
         IndoorF.cleanup()
         GPIO.cleanup()
+        print("Programm stopped successfully")
 
 
 
