@@ -8,7 +8,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 from adafruit_mcp3xxx.mcp3008 import MCP3008
 import RPi.GPIO as GPIO
 
-led_if_pin=18
+LED_IF_PIN = 18
 
 class EnvController:
     def __init__(
@@ -25,8 +25,8 @@ class EnvController:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(fan_pin, GPIO.OUT)
         GPIO.output(fan_pin, GPIO.LOW)
-        GPIO.setup(led_if_pin, GPIO.OUT)
-        GPIO.output(led_if_pin, GPIO.LOW)
+        GPIO.setup(LED_IF_PIN, GPIO.OUT)
+        GPIO.output(LED_IF_PIN, GPIO.LOW)
         
         self.fan_pin = fan_pin
 
@@ -58,9 +58,9 @@ class EnvController:
         ldr_value = self.ldr.value
         print(f"[LDR] Value: {ldr_value}")
         if ldr_value < self.ldr_threshold:
-            GPIO.output(led_if_pin, GPIO.HIGH)
+            GPIO.output(LED_IF_PIN, GPIO.HIGH)
         else:
-            GPIO.output(led_if_pin, GPIO.LOW)
+            GPIO.output(LED_IF_PIN, GPIO.LOW)
 
         # --- Climate control ---
         if now - self.last_dht_read >= 3:
@@ -90,5 +90,5 @@ class EnvController:
 
     def cleanup(self):
         GPIO.output(self.fan_pin, GPIO.LOW)
-        GPIO.output(led_if_pin, GPIO.LOW)
+        GPIO.output(LED_IF_PIN, GPIO.LOW)
         GPIO.cleanup()
