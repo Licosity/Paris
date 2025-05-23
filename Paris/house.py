@@ -48,6 +48,10 @@ class House:
             temp = dht_sensor.temperature
             motion = GPIO.input(motion_pin)
             now = time.time()
+            
+            print(temp) #debug
+            if motion: #debug
+                print("motion") #debug
 
             if temp is not None and temp < self.min_temp and motion:
                 GPIO.output(infra_pin, GPIO.HIGH)
