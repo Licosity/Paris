@@ -4,27 +4,26 @@ import rpi_ws281x
 import neopixel
 import RPi.GPIO as GPIO
 
-# Constants
-GLOW_TIME = 5  # seconds
-DELAY_TIME = 0.5  # seconds
-NUM_LAMPS = 6
+
+#street constants
+GLOW_TIME = 3  # seconds
+DELAY_TIME = 0.3  # seconds
 WHITE = (255, 255, 255)
 
-
 class StreetLampController:
-    def __init__(self, neopixel_pin, motion_pins, color=WHITE, use_neighbor_logic=True):
-        self.num_lamps = len(motion_pins)
+    def __init__(self, NEOPIXEL_PIN, MOTION_PIN, color=WHITE, use_neighbor_logic=True):
+        self.num_lamps = len(MOTION_PIN)
         self.color = color
-        self.motion_pins = motion_pins
+        self.motion_pins = MOTION_PIN
         self.use_neighbor_logic = use_neighbor_logic
 
         # Setup motion sensors
         GPIO.setmode(GPIO.BCM)
-        for pin in motion_pins:
+        for pin in MOTION_PIN:
             GPIO.setup(pin, GPIO.IN)
 
         # Setup NeoPixel strip
-        self.strip = neopixel.NeoPixel(neopixel_pin, self.num_lamps, auto_write=False)
+        self.strip = neopixel.NeoPixel(NEOPIXEL_PIN, self.num_lamps, auto_write=False)
 
         # State tracking
         self.motion_states = [False] * self.num_lamps
@@ -50,6 +49,7 @@ class StreetLampController:
 
         # 3. Neighbor logic
         if self.use_neighbor_logic:
+            
             for i in range(self.num_lamps):
                 if not self.motion_states[i]:
                     left = i - 1 if i > 0 else 0
