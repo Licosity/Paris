@@ -7,10 +7,10 @@ class House:
     def __init__(
         self,
         dht_o_pin=13,
-        motion_o_pin=15,
-        infra_o_pin=17,
-        dht_u_pin=14,
-        motion_u_pin=16,
+        motion_o_pin=16,
+        infra_o_pin=22,
+        dht_u_pin=11,
+        motion_u_pin=15,
         infra_u_pin=18,
         min_temp=17,
         run_time=30
