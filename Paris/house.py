@@ -66,10 +66,10 @@ class House:
             self.dht_u, self.motion_u_pin, self.infra_u_pin, self.last_activation_u
         )
 
-
+house = House()
 try:
     while True:
-        House.update()
+        house.update()
         time.sleep(0.1)
 except KeyboardInterrupt:
     print("Cleaning up program...")
