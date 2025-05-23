@@ -92,3 +92,13 @@ class EnvController:
         GPIO.output(self.fan_pin, GPIO.LOW)
         GPIO.output(LED_IF_PIN, GPIO.LOW)
         GPIO.cleanup()
+
+
+try:
+    while True:
+        ldr_value = 300
+        EnvController.update()
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    print("Cleaning up program...")
+    EnvController.cleanup()
