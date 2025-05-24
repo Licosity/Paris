@@ -21,6 +21,5 @@ print("Kanal 2: ","{:>5}\t{:>5.3f}".format
 (chan2.value, chan2.voltage))
 print("Kanal 3: ","{:>5}\t{:>5.3f}".format
 (chan3.value, chan3.voltage))
-print("--------------------------------------------
--------")
+print("----")
 time.sleep(1)
