@@ -9,16 +9,16 @@ import RPi.GPIO as GPIO
 
 
 
-LED_IF_PIN = 20 # actual pin 38
 
 class EnvController:
     def __init__(
         self,
         dht_pin=12, # actual pin 32
         fan_pin=16, # actual pin 36
-        ldr_channel=21, # actual pin 40
+        ldr_channel=0,
+        LED_IF_PIN = 20, # actual pin 38
         ldr_threshold=400,
-        temp_threshold=28,
+        temp_threshold=0.5,
         humidity_threshold=60,
         min_fan_on_time=30
     ):
@@ -55,12 +55,13 @@ class EnvController:
         now = time.monotonic()
 
         # --- Light control ---
-        ldr_value = self.ldr.value
-        print(f"[LDR] Value: {ldr_value}")
-        if ldr_value < self.ldr_threshold:
-            GPIO.output(LED_IF_PIN, GPIO.HIGH)
+        ldr_voltage = self.ldr.voltage
+        print(f"[LDR] Voltage: {ldr_voltage:.3f} V")
+        if ldr_voltage < self.ldr_threshold:
+            GPIO.output(self.LED_IF_PIN, GPIO.HIGH)
         else:
-            GPIO.output(LED_IF_PIN, GPIO.LOW)
+            GPIO.output(self.LED_IF_PIN, GPIO.LOW)
+
 
         # --- Climate control ---
         if now - self.last_dht_read >= 3:
