@@ -54,6 +54,7 @@ class EnvController:
     def update(self):
         now = time.monotonic()
 
+        LED_IF_PIN = 20, # actual pin 38
         # --- Light control ---
         ldr_voltage = self.ldr.voltage
         print(f"[LDR] Voltage: {ldr_voltage:.3f} V")
