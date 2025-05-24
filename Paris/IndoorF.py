@@ -98,7 +98,6 @@ IndoorF = EnvController()
 
 try:
     while True:
-        ldr_value = 300
         IndoorF.update()
         time.sleep(0.1)
 except KeyboardInterrupt:
