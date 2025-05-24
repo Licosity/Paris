@@ -3,9 +3,8 @@ import board
 import busio
 import digitalio
 import adafruit_dht
-import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
-from adafruit_mcp3xxx.mcp3008 import MCP3008
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
 import RPi.GPIO as GPIO
 
 
@@ -45,11 +44,10 @@ class EnvController:
         self.current_temp = None
         self.current_humidity = None
 
-        # --- MCP3008 for LDR ---
-        self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-        self.cs = digitalio.DigitalInOut(board.CE0)
-        self.mcp = MCP.MCP3008(self.spi, self.cs)
-        self.ldr = AnalogIn(self.mcp, getattr(MCP, f"P{ldr_channel}"))
+        # --- ADS1115 for LDR ---
+        self.i2c = busio.I2C(board.SCL, board.SDA)
+        self.ads = ADS.ADS1115(self.i2c)
+        self.ldr = AnalogIn(self.ads, getattr(ADS, f"P{ldr_channel}"))
         self.ldr_threshold = ldr_threshold
 
 
