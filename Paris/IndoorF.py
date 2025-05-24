@@ -20,7 +20,6 @@ class EnvController:
         temp_threshold=0.5,
         humidity_threshold=60,
         min_fan_on_time=30,
-        LED_IF_PIN = 20 # actual pin 38
     ):
         # --- GPIO Setup ---
         GPIO.setmode(GPIO.BCM)
@@ -30,7 +29,7 @@ class EnvController:
         GPIO.output(LED_IF_PIN, GPIO.LOW)
         
         self.fan_pin = fan_pin
-
+        self.LED_IF_PIN  = LED_IF_PIN
         # --- DHT22 Sensor ---
         self.dht = adafruit_dht.DHT22(board.D12)  # actual pin 32
 
@@ -54,7 +53,6 @@ class EnvController:
     def update(self):
         now = time.monotonic()
 
-        LED_IF_PIN = 20, # actual pin 38
         # --- Light control ---
         ldr_voltage = self.ldr.voltage
         print(f"[LDR] Voltage: {ldr_voltage:.3f} V")
