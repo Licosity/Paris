@@ -19,7 +19,8 @@ class EnvController:
         ldr_threshold=400,
         temp_threshold=0.5,
         humidity_threshold=60,
-        min_fan_on_time=30
+        min_fan_on_time=30,
+        LED_IF_PIN = 20 # actual pin 38
     ):
         # --- GPIO Setup ---
         GPIO.setmode(GPIO.BCM)
