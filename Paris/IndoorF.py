@@ -8,7 +8,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import RPi.GPIO as GPIO
 
 
-
+LED_IF_PIN = 20, # actual pin 38
 
 class EnvController:
     def __init__(
@@ -16,7 +16,6 @@ class EnvController:
         dht_pin=12, # actual pin 32
         fan_pin=16, # actual pin 36
         ldr_channel=0,
-        LED_IF_PIN = 20, # actual pin 38
         ldr_threshold=400,
         temp_threshold=0.5,
         humidity_threshold=60,
