@@ -9,6 +9,7 @@ import RPi.GPIO as GPIO
 GLOW_TIME = 3  # seconds
 DELAY_TIME = 0.3  # seconds
 WHITE = (255, 255, 255)
+NEOPIXEL_PIN, MOTION_PIN = 
 
 class StreetLampController:
     def __init__(self, NEOPIXEL_PIN, MOTION_PIN, color=WHITE, use_neighbor_logic=True):
