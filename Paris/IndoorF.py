@@ -31,7 +31,7 @@ class EnvController:
         self.fan_pin = fan_pin
         self.LED_IF_PIN  = LED_IF_PIN
         # --- DHT22 Sensor ---
-        self.dht = adafruit_dht.DHT22(board.D12)  # actual pin 32
+        self.dht = adafruit_dht.DHT22(board.D6)  # actual pin 32
 
         self.temp_threshold = temp_threshold
         self.humidity_threshold = humidity_threshold
