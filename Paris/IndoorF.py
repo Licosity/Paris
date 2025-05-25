@@ -95,15 +95,13 @@ class EnvController:
 
 IndoorF = EnvController()
 #test
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(fan_pin, GPIO.OUT)
+
 
 try:
     while True:
-      #  IndoorF.update()
+        IndoorF.update()
         time.sleep(1.1)
-        GPIO.output(fan_pin, GPIO.HIGH)
-        print("[Fan] ON")
+
 except KeyboardInterrupt:
     print("Cleaning up program...")
     IndoorF.cleanup()
