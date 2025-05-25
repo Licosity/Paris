@@ -16,7 +16,7 @@ class EnvController:
         dht_pin=6, # actual pin 32
         fan_pin=12, # actual pin 36
         ldr_channel=0,
-        ldr_threshold=500,
+        ldr_threshold=50,
         temp_threshold=0.5,
         humidity_threshold=60,
         min_fan_on_time=30,
