@@ -18,7 +18,7 @@ class EnvController:
         ldr_channel=0,
         ldr_threshold=50,
         temp_threshold=0.5,
-        humidity_threshold=60,
+        humidity_threshold=6000,
         min_fan_on_time=30,
     ):
         # --- GPIO Setup ---
