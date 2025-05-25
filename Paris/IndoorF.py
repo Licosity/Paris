@@ -100,6 +100,7 @@ IndoorF = EnvController()
 try:
     while True:
         IndoorF.update()
+        GPIO.output(LED_IF_PIN, GPIO.HIGH)
         time.sleep(1.1)
 
 except KeyboardInterrupt:
