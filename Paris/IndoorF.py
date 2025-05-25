@@ -13,7 +13,7 @@ fan_pin=12, # actual pin 36
 class EnvController:
     def __init__(
         self,
-        dht_pin=13, # actual pin 32
+        dht_pin=6, # actual pin 32
         fan_pin=12, # actual pin 36
         ldr_channel=0,
         ldr_threshold=100,
