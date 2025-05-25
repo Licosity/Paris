@@ -100,7 +100,7 @@ try:
     while True:
         IndoorF.update()
         time.sleep(5.1)
-        GPIO.output(self.fan_pin, GPIO.HIGH)
+        GPIO.output(fan_pin, GPIO.HIGH)
         print("[Fan] ON")
 except KeyboardInterrupt:
     print("Cleaning up program...")
