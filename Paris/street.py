@@ -15,7 +15,7 @@ MOTION_PINS = [17, 12, 27, 22, 23, 24]  # actual pin 11, 12, 13, 15, 16, 18
 
 class StreetLampController:
 
-    def __init__(self, NEOPIXEL_PIN = 4, MOTION_PIN = [17, 12, 27, 22, 23, 24], color=WHITE, use_neighbor_logic=True):
+    def __init__(self, NEOPIXEL_PIN = 4, MOTION_PIN = 17, color=WHITE, use_neighbor_logic=True):
         self.num_lamps = len(MOTION_PIN)
         self.color = color
         self.motion_pins = MOTION_PIN
