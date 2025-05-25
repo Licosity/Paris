@@ -66,3 +66,13 @@ class StreetLampController:
 
         # 4. Push to strip
         self.strip.show()
+
+street  = StreetLampController()
+#test
+try:
+    while True:
+        street.update()
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    print("Cleaning up program...")
+    GPIO.cleanup()
