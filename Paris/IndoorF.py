@@ -95,11 +95,12 @@ class EnvController:
 
 IndoorF = EnvController()
 #test
-
+GPIO.setup(LED_IF_PIN, GPIO.OUT)
+GPIO.output(LED_IF_PIN, GPIO.LOW)
 
 try:
     while True:
-        IndoorF.update()
+       # IndoorF.update()
         GPIO.output(LED_IF_PIN, GPIO.HIGH)
         time.sleep(1.1)
 
