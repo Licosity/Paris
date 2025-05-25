@@ -95,7 +95,8 @@ class EnvController:
 
 IndoorF = EnvController()
 #test
-
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(fan_pin, GPIO.OUT)
 try:
     while True:
       #  IndoorF.update()
