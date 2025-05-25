@@ -99,7 +99,11 @@ IndoorF = EnvController()
 try:
     while True:
         IndoorF.update()
-        time.sleep(0.1)
+        time.sleep(5.1)
+         GPIO.output(self.fan_pin, GPIO.HIGH)
+                self.fan_running = True
+                self.last_fan_on_time = now
+                print("[Fan] ON")
 except KeyboardInterrupt:
     print("Cleaning up program...")
     IndoorF.cleanup()
