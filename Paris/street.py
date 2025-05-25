@@ -14,8 +14,6 @@ MOTION_PINS = [17, 12, 27, 22, 23, 24]  # actual pin 11, 12, 13, 15, 16, 18
 
 
 class StreetLampController:
-    NEOPIXEL_PIN = 4  # actual pin 7
-    MOTION_PINS = [17, 12, 27, 22, 23, 24]  # actual pin 11, 12, 13, 15, 16, 18
 
     def __init__(self, NEOPIXEL_PIN, MOTION_PIN, color=WHITE, use_neighbor_logic=True):
         self.num_lamps = len(MOTION_PIN)
@@ -77,6 +75,8 @@ street  = StreetLampController()
 #test
 try:
     while True:
+        NEOPIXEL_PIN = 4  # actual pin 7
+        MOTION_PINS = [17, 12, 27, 22, 23, 24]  # actual pin 11, 12, 13, 15, 16, 18
         street.update()
         time.sleep(0.1)
 except KeyboardInterrupt:
