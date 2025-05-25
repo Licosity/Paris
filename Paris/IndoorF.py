@@ -56,7 +56,7 @@ class EnvController:
         # --- Light control ---
         ldr_voltage = self.ldr.voltage
         print(f"[LDR] Voltage: {ldr_voltage:.3f} V")
-        if ldr_voltage < self.ldr_threshold:
+        if ldr_voltage > self.ldr_threshold:
             GPIO.output(self.LED_IF_PIN, GPIO.HIGH)
         else:
             GPIO.output(self.LED_IF_PIN, GPIO.LOW)
