@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 
 
 LED_IF_PIN = 20, # actual pin 38
-fan_pin=16, # actual pin 36
+fan_pin=12, # actual pin 36
 class EnvController:
     def __init__(
         self,
@@ -96,14 +96,13 @@ class EnvController:
 IndoorF = EnvController()
 #test
 GPIO.setmode(GPIO.BCM)
-
 GPIO.setup(fan_pin, GPIO.OUT)
-self.fan_pin = fan_pin
+
 try:
     while True:
       #  IndoorF.update()
         time.sleep(1.1)
-        GPIO.output(self.fan_pin, GPIO.HIGH)
+        GPIO.output(fan_pin, GPIO.HIGH)
         print("[Fan] ON")
 except KeyboardInterrupt:
     print("Cleaning up program...")
