@@ -16,7 +16,7 @@ class EnvController:
         dht_pin=6, # actual pin 32
         fan_pin=12, # actual pin 36
         ldr_channel=0,
-        ldr_threshold=100,
+        ldr_threshold=500,
         temp_threshold=0.5,
         humidity_threshold=60,
         min_fan_on_time=30,
@@ -56,7 +56,7 @@ class EnvController:
         # --- Light control ---
         ldr_voltage = self.ldr.voltage
         print(f"[LDR] Voltage: {ldr_voltage:.3f} V")
-        if ldr_voltage > self.ldr_threshold:
+        if ldr_voltage < self.ldr_threshold:
             GPIO.output(self.LED_IF_PIN, GPIO.HIGH)
         else:
             GPIO.output(self.LED_IF_PIN, GPIO.LOW)
