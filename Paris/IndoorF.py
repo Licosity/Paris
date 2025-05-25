@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 
 
 LED_IF_PIN = 20, # actual pin 38
-
+fan_pin=16, # actual pin 36
 class EnvController:
     def __init__(
         self,
