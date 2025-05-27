@@ -95,11 +95,11 @@ class EnvController:
 
 IndoorF = EnvController()
 #test
- GPIO.setmode(GPIO.BCM)
-        GPIO.setup(fan_pin, GPIO.OUT)
-        GPIO.output(fan_pin, GPIO.LOW)
-        GPIO.setup(LED_IF_PIN, GPIO.OUT)
-        GPIO.output(LED_IF_PIN, GPIO.LOW)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(fan_pin, GPIO.OUT)
+GPIO.output(fan_pin, GPIO.LOW)
+GPIO.setup(LED_IF_PIN, GPIO.OUT)
+GPIO.output(LED_IF_PIN, GPIO.LOW)
        
 
 try:
