@@ -27,7 +27,7 @@ class StreetLampController:
             GPIO.setup(pin, GPIO.IN)
 
         # Setup NeoPixel strip
-        self.strip = neopixel.NeoPixel(NEOPIXEL_PIN, self.num_lamps, auto_write=False)
+        self.strip = neopixel.NeoPixel(board.D4, self.num_lamps, auto_write=False)
 
         # State tracking
         self.motion_states = [False] * self.num_lamps
