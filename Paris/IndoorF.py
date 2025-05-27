@@ -8,8 +8,8 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import RPi.GPIO as GPIO
 
 
-LED_IF_PIN = 20, # actual pin 38
-fan_pin=12, # actual pin 36
+LED_IF_PIN = 20 # actual pin 38
+fan_pin=12 # actual pin 36
 class EnvController:
     def __init__(
         self,
@@ -100,7 +100,7 @@ IndoorF = EnvController()
 try:
     while True:
         IndoorF.update()
-        GPIO.output(self.fan_pin, GPIO.HIGH)
+        GPIO.output(fan_pin, GPIO.HIGH)
         time.sleep(1.1)
 
 except KeyboardInterrupt:
