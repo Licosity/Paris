@@ -10,7 +10,7 @@ GLOW_TIME = 3  # seconds
 DELAY_TIME = 0.3  # seconds
 WHITE = (255, 255, 255)
 NEOPIXEL_PIN = 4  # actual pin 7
- # actual pin 11, 12, 13, 15, 16, 18
+motion_pins = [17, 12, 27, 22, 23, 24]  # actual pin 11, 12, 13, 15, 16, 18
 
 
 class StreetLampController:
