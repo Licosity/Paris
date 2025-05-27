@@ -7,7 +7,7 @@ import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 import RPi.GPIO as GPIO
 
-
+       
 LED_IF_PIN = 20 # actual pin 38
 fan_pin=12 # actual pin 36
 class EnvController:
@@ -95,12 +95,19 @@ class EnvController:
 
 IndoorF = EnvController()
 #test
-
+ GPIO.setmode(GPIO.BCM)
+        GPIO.setup(fan_pin, GPIO.OUT)
+        GPIO.output(fan_pin, GPIO.LOW)
+        GPIO.setup(LED_IF_PIN, GPIO.OUT)
+        GPIO.output(LED_IF_PIN, GPIO.LOW)
+       
 
 try:
     while True:
         IndoorF.update()
         GPIO.output(fan_pin, GPIO.HIGH)
+        GPIO.output(LED_IF_PIN, GPIO.HIGH)
+        
         time.sleep(1.1)
 
 except KeyboardInterrupt:
